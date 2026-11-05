@@ -28,6 +28,6 @@ App 使用 Pydantic 定義四個必填欄位，並透過 OpenAI Structured Outpu
 - [開啟雲端 App](https://1151genai-app-development-ltgwqk3xzwubca3vsepynj.streamlit.app/)
 - 部署分支為 `main`，入口為 `Midterm Mini-Project/app.py`。
 - 已完成空白、過長和 API 關閉時送出正常文字的離線檢查。正常資料已取得一筆成功的雲端 API 回應。
-- 資訊不足測試、雲端驗收日期與觀看權限待補。詳細結果記在[專題設計與驗收紀錄](第08週_課堂簡化版_專題設計與驗收紀錄.md)。
+- 「正常資料」與「資訊不足」均已取得雲端真實 API 回應，測試模型為 `gpt-5.4-mini`。2026-11-05 確認訪客可開啟 App，詳細結果見[專題設計與驗收紀錄](第08週_課堂簡化版_專題設計與驗收紀錄.md)。
 
 API 預設關閉。開啟後，每次有效送出最多發出一次請求，可能產生費用。
