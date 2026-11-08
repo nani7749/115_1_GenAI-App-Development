@@ -256,12 +256,13 @@ if st.session_state.record is not None:
 
         # 清單逐筆顯示；空清單明說沒有項目，其他文字欄位直接顯示。
         if isinstance(value, list):
-            if not value:
-                st.write("原文沒有對應項目。")
-            for item in value:
-                st.write("• " + item)
-        else:
-            st.write(value)
+                if not value:
+                    empty_message = (
+                    "本次沒有建議追問。"
+                    if name == "follow_up_questions"
+                    else "原文沒有提到已嘗試的方法。"
+                )
+                st.write(empty_message)
 
     # 原始JSON供查欄位、型別與除錯，不取代逐欄閱讀原文。
     with st.expander("查看原始 JSON"):
