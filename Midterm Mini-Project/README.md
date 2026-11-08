@@ -13,7 +13,7 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-已建立 `.venv` 且已安裝套件時，進入專題資料夾後直接執行最後一行即可。本機的 `OPENAI_API_KEY` 設在專題資料夾內的 `.env`，雲端則設在 Streamlit Secrets。程式預設使用 `gpt-5.4-mini`。
+已建立 `.venv` 且已安裝套件時，進入專題資料夾後直接執行最後一行即可。本機請將 `.env.example` 複製為 `.env`，再填入 `OPENAI_API_KEY`。雲端請依 `.streamlit/secrets.example.toml` 的格式，在 Streamlit Secrets 設定金鑰。程式預設使用 `gpt-5.4-mini`。[本機設定範例](.env.example) · [雲端設定範例](.streamlit/secrets.example.toml)
 
 ## 操作方式
 
