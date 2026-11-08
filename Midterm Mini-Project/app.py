@@ -247,7 +247,8 @@ if st.session_state.error:
 if st.session_state.record is not None:
     record = st.session_state.record
     st.success("真實 API 結果：格式檢查通過，內容仍需人工核對。")
-    st.write("本筆結果的原文：", record["input"])
+    st.subheader("本筆結果的原文")
+    st.text(record["input"])
 
     # 顯示標籤不改JSON的key；沒有自訂標籤時，get回退到原欄位名稱。
     for name, value in record["data"].items():
