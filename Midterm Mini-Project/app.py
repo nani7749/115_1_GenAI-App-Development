@@ -254,15 +254,18 @@ if st.session_state.record is not None:
     for name, value in record["data"].items():
         st.subheader(FIELD_LABELS.get(name, name))
 
-        # 清單逐筆顯示；空清單明說沒有項目，其他文字欄位直接顯示。
         if isinstance(value, list):
-                if not value:
-                    empty_message = (
+            if not value:
+                empty_message = (
                     "本次沒有建議追問。"
                     if name == "follow_up_questions"
                     else "原文沒有提到已嘗試的方法。"
                 )
                 st.write(empty_message)
+            for item in value:
+                st.write("• " + item)
+        else:
+            st.write(value)
 
     # 原始JSON供查欄位、型別與除錯，不取代逐欄閱讀原文。
     with st.expander("查看原始 JSON"):
