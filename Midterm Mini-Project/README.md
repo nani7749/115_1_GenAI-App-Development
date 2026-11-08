@@ -23,7 +23,7 @@ python -m venv .venv
 
 > 我在 VS Code 的終端機執行 python app.py，畫面顯示 ModuleNotFoundError。我試過重新開啟終端機，還是出現同樣的錯誤。
 
-App 使用 Pydantic 定義四個必填欄位，並透過 OpenAI Structured Outputs 檢查回應格式。輸出包含出問題的操作、錯誤訊息、已嘗試的方法及建議追問。缺少的操作或錯誤訊息會標示「原文未提供」，結果仍需對照原文確認。
+我選擇 Pydantic，因為可以用一個 Python 類別定義必填欄位、資料型別與欄位用途。App 透過 OpenAI Structured Outputs 取得四個欄位：出問題的操作、錯誤訊息、已嘗試的方法及建議追問。原文缺少操作或錯誤訊息時，對應欄位會標示「原文未提供」。格式通過後，使用者仍需逐欄對照原文。
 
 ## 部署與測試
 
