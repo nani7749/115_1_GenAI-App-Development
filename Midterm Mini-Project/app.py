@@ -25,7 +25,11 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 # 此處設定瀏覽器頁面；下方st.title才是畫面內的專題標題。
-st.set_page_config(page_title="期中個人專題-電腦求助訊息整理", layout="centered")
+st.set_page_config(
+    page_title="電腦求助訊息整理",
+    page_icon=":material/chat:",
+    layout="centered",
+)
 
 # ---------- 1. 自行完成專題定位與輸出設計 ----------
 # A／B／C是個人設計位置；可以自訂情境，不是填入教師範例的固定答案。
@@ -129,40 +133,49 @@ def read_question_file(uploaded_file):
     return question
 
 
-# ---------- 3. 畫面、API 開關與對話紀錄 ----------
+# ---------- 3. 頁首操作與對話紀錄 ----------
 st.title(APP_TITLE or "我的期中專題（尚未設定）")
-st.caption("貼上同學的求助訊息，或從「匯入問題」帶入範例與文字檔。請勿輸入個資或金鑰。")
-enable_api = st.checkbox("啟用真實 API（可能產生費用）", value=False)
-st.caption("每次送出會整理該則訊息。真實 API 開啟後，每次有效送出最多發出 1 次請求。")
+st.caption("整理同學的電腦求助，找出出錯的操作、錯誤訊息與下一步要問的問題。")
 
 # 保留前一版在同一個工作階段已產生的結果。
 previous_record = st.session_state.pop("record", None)
 st.session_state.setdefault("answer_history", [previous_record] if previous_record else [])
 st.session_state.setdefault("error", "")
+
+with st.container(horizontal=True, vertical_alignment="center", gap="medium"):
+    with st.popover("匯入問題", type="primary", icon=":material/upload_file:"):
+        st.caption("範例與檔案會先帶入下方輸入框，確認後再送出。")
+        with st.container(horizontal=True):
+            if st.button("帶入正常範例"):
+                st.session_state.question_input = NORMAL_SAMPLE
+            if st.button("帶入資訊不足範例"):
+                st.session_state.question_input = INSUFFICIENT_SAMPLE
+
+        uploaded_file = st.file_uploader("上傳 UTF-8 .txt 檔", type=["txt"], max_upload_size=1)
+        if st.button("將檔案帶入輸入框", disabled=uploaded_file is None):
+            try:
+                st.session_state.question_input = read_question_file(uploaded_file)
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                st.caption("已帶入下方輸入框。")
+
+    enable_api = st.toggle("啟用真實 API", value=False, help="有效送出可能產生費用。")
+    clear_chat = st.button("清除對話", type="tertiary", icon=":material/delete:")
+
 if st.session_state.get("api_mode") != enable_api:
     st.session_state.error = ""
     st.session_state.api_mode = enable_api
 
-if st.button("清除對話"):
+if clear_chat:
     st.session_state.answer_history.clear()
     st.session_state.error = ""
     st.session_state.question_input = ""
 
-with st.expander("匯入問題"):
-    with st.container(horizontal=True):
-        if st.button("帶入正常範例"):
-            st.session_state.question_input = NORMAL_SAMPLE
-        if st.button("帶入資訊不足範例"):
-            st.session_state.question_input = INSUFFICIENT_SAMPLE
-
-    uploaded_file = st.file_uploader("上傳 UTF-8 .txt 檔", type=["txt"], max_upload_size=1)
-    if st.button("將檔案帶入輸入框", disabled=uploaded_file is None):
-        try:
-            st.session_state.question_input = read_question_file(uploaded_file)
-        except ValueError as exc:
-            st.error(str(exc))
-        else:
-            st.caption("檔案已帶入下方輸入框，可以修改後再送出。")
+if enable_api:
+    st.caption("API 已啟用，每次有效送出最多 1 次請求。請勿輸入個資或金鑰。")
+else:
+    st.caption("目前只檢查輸入。開啟真實 API 後，送出才會產生 AI 回覆。")
 
 # ---------- 4. 送出後檢查資料，再決定是否呼叫 API ----------
 source = st.chat_input(
@@ -270,7 +283,7 @@ if source is not None:
 # ---------- 5. 依順序呈現每一筆問題和 AI 回覆 ----------
 history = st.session_state.answer_history
 if not history and checked_source is None and not st.session_state.error:
-    st.caption("輸入一則求助訊息，開始整理。")
+    st.info("在下方貼上求助訊息，或從「匯入問題」帶入範例。", icon=":material/chat:")
 else:
     for answer in history:
         with st.chat_message("user"):
@@ -289,6 +302,8 @@ else:
                         st.write(empty_message)
                     for item in value:
                         st.write("• " + item)
+                elif name == "error_message" and value != "原文未提供":
+                    st.code(value, language=None, wrap_lines=True)
                 else:
                     st.write(value)
 
