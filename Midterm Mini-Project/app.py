@@ -133,17 +133,153 @@ def read_question_file(uploaded_file):
     return question
 
 
+GLASS_STYLE = """
+<style>
+:root {
+    --glass-canvas: #edf4ff;
+    --glass-surface: rgba(255, 255, 255, 0.68);
+    --glass-edge: rgba(38, 62, 110, 0.18);
+    --glass-halo: rgba(93, 144, 255, 0.24);
+    --glass-violet: rgba(171, 145, 255, 0.24);
+    --glass-paper: #f7faff;
+    --glass-question: #e4efff;
+    --glass-shadow: rgba(26, 53, 103, 0.15);
+    --glass-highlight: rgba(255, 255, 255, 0.85);
+}
+@supports (color: light-dark(white, black)) {
+    :root {
+        --glass-canvas: light-dark(#edf4ff, #0b1222);
+        --glass-surface: light-dark(rgba(255, 255, 255, 0.68), rgba(26, 41, 69, 0.72));
+        --glass-edge: light-dark(rgba(38, 62, 110, 0.18), rgba(191, 212, 255, 0.2));
+        --glass-halo: light-dark(rgba(93, 144, 255, 0.24), rgba(64, 115, 224, 0.24));
+        --glass-violet: light-dark(rgba(171, 145, 255, 0.24), rgba(124, 87, 217, 0.22));
+        --glass-paper: light-dark(#f7faff, #18243a);
+        --glass-question: light-dark(#e4efff, #213754);
+        --glass-shadow: light-dark(rgba(26, 53, 103, 0.15), rgba(0, 0, 0, 0.27));
+        --glass-highlight: light-dark(rgba(255, 255, 255, 0.85), rgba(220, 234, 255, 0.16));
+    }
+}
+
+[data-testid="stAppViewContainer"] {
+    background:
+        radial-gradient(ellipse at 12% 5%, var(--glass-halo), transparent 42%),
+        radial-gradient(ellipse at 92% 16%, var(--glass-violet), transparent 39%),
+        var(--glass-canvas);
+    background-attachment: fixed;
+}
+
+[data-testid="stMainBlockContainer"] {
+    max-width: 52rem;
+    padding-top: clamp(3.8rem, 9vh, 6rem);
+}
+
+.st-key-glass_hero h1 {
+    font-family: Inter, system-ui, "Microsoft JhengHei", sans-serif;
+    font-size: clamp(2rem, 5vw, 3.35rem);
+    line-height: 1.12;
+    letter-spacing: -0.035em;
+}
+
+.st-key-glass_controls,
+[data-testid="stChatInput"] {
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-edge);
+    border-radius: 1.35rem;
+    box-shadow: inset 0 1px var(--glass-highlight), 0 12px 32px var(--glass-shadow);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    backdrop-filter: blur(18px) saturate(145%);
+}
+
+.st-key-glass_controls {
+    padding: 0.65rem 0.85rem;
+}
+
+.st-key-glass_controls button {
+    border-radius: 999px;
+}
+
+.st-key-glass_import [data-testid="stPopoverButton"] {
+    background: #3157a1;
+    color: #fff;
+    border-color: transparent;
+}
+
+.st-key-glass_import [data-testid="stPopoverButton"]:hover {
+    background: #254787;
+}
+
+[data-testid="stChatInput"] {
+    padding: 0.25rem 0.45rem;
+}
+
+[data-testid="stChatInput"]:focus-within {
+    border-color: light-dark(#456dbb, #9cbbff);
+}
+
+[data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"] {
+    background: transparent;
+}
+
+[data-testid="stBottomBlockContainer"] {
+    max-width: 52rem;
+}
+
+[data-testid="stChatMessage"] {
+    background: var(--glass-paper);
+    border: 1px solid var(--glass-edge);
+    border-radius: 1.15rem;
+    padding: 0.85rem 1rem;
+}
+
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+    background: var(--glass-question);
+}
+
+@media (max-width: 600px) {
+    [data-testid="stMainBlockContainer"] {
+        padding-inline: 1rem;
+    }
+    .st-key-glass_controls {
+        padding: 0.6rem;
+    }
+    [data-testid="stChatMessage"] {
+        padding: 0.65rem 0.75rem;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .st-key-glass_controls,
+    [data-testid="stChatInput"] {
+        background: var(--glass-paper);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
+</style>
+"""
+
+
 # ---------- 3. 頁首操作與對話紀錄 ----------
-st.title(APP_TITLE or "我的期中專題（尚未設定）")
-st.caption("整理同學的電腦求助，找出出錯的操作、錯誤訊息與下一步要問的問題。")
+st.html(GLASS_STYLE)
+with st.container(key="glass_hero"):
+    st.title(APP_TITLE or "我的期中專題（尚未設定）")
+    st.caption("整理同學的電腦求助，找出出錯的操作、錯誤訊息與下一步要問的問題。")
 
 # 保留前一版在同一個工作階段已產生的結果。
 previous_record = st.session_state.pop("record", None)
 st.session_state.setdefault("answer_history", [previous_record] if previous_record else [])
 st.session_state.setdefault("error", "")
 
-with st.container(horizontal=True, vertical_alignment="center", gap="medium"):
-    with st.popover("匯入問題", type="primary", icon=":material/upload_file:"):
+with st.container(
+    key="glass_controls",
+    horizontal=True,
+    vertical_alignment="center",
+    gap="small",
+):
+    with st.popover(
+        "匯入問題", type="primary", icon=":material/upload_file:", key="glass_import"
+    ):
         st.caption("範例與檔案會先帶入下方輸入框，確認後再送出。")
         with st.container(horizontal=True):
             if st.button("帶入正常範例"):
@@ -159,6 +295,14 @@ with st.container(horizontal=True, vertical_alignment="center", gap="medium"):
                 st.error(str(exc))
             else:
                 st.caption("已帶入下方輸入框。")
+
+    with st.popover("使用方式", icon=":material/help:"):
+        st.markdown(
+            "1. 在下方輸入求助訊息，或從「匯入問題」帶入範例或 UTF-8 的 .txt 檔。\n"
+            "2. 確認原文後按送出。啟用真實 API 才會取得 AI 回覆。\n"
+            "3. 往上滑回看問答，或展開「查看原始 JSON」逐欄核對。"
+        )
+        st.caption("每則原文最多 6,000 字元。重新整理或關閉分頁後，會開始新的對話。")
 
     enable_api = st.toggle("啟用真實 API", value=False, help="有效送出可能產生費用。")
     clear_chat = st.button("清除對話", type="tertiary", icon=":material/delete:")
