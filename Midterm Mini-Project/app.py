@@ -134,7 +134,7 @@ def read_question_file(uploaded_file):
 
 # ---------- liquid glass style ----------
 # ---------- 3. 頁首操作與對話紀錄 ----------
-st.html(Path(__file__).with_name("styles.css"))
+st.html(Path(__file__).with_name("style.css"))
 with st.container(key="glass_hero"):
     st.title(APP_TITLE or "我的期中專題（尚未設定）")
     st.caption("整理同學的電腦求助，找出出錯的操作、錯誤訊息與下一步要問的問題。")
