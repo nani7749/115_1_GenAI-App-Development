@@ -3,7 +3,7 @@
 # 啟動：在week11/week11_rag_revised執行
 # python -m streamlit run student/app.py
 # 預設離線0次API；勾選真實API時每題1次Embedding＋最多1次Responses。
-# 學生只補A；其他函式與畫面完整提供。
+# 學生版已完成A；其他函式與畫面由教材提供。
 
 
 import json
@@ -15,10 +15,11 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 # 金鑰：部署時讀平台Secrets；本機讀.env或環境變數（見read_setting）。
-# 先讀week11_rag_revised/.env（Notebook也讀同一份），再讀入口資料夾的.env；已有的值不會被覆蓋。
+# 依序讀App套件、入口與Repo根目錄的.env；已有設定不覆蓋。
 PACKAGE = Path(__file__).resolve().parents[1]
 load_dotenv(PACKAGE / '.env')
 load_dotenv(Path(__file__).resolve().parent / '.env')
+load_dotenv(PACKAGE.parents[1] / '.env')
 st.set_page_config(page_title='文件問答', layout='centered')
 
 
@@ -107,10 +108,6 @@ def build_context(hits, max_chars=4000):
     """A：把證據組成有來源標籤的context；回傳text與實際放進去的sources。"""
     parts, sources = [], []
 
-    # TODO A：依序處理hits裡的每一筆
-    # 1. 標籤依序是[來源1]、[來源2]…；每段寫成「標籤 來源／chunk_id」，換行後接完整原文。
-    # 2. 段與段之間空一行（"\n\n"）；加入這段後總長度會超過max_chars就停止，不切半。
-    # 3. 用dict(hit)複製一份再加"label"，放進sources；不可改到原本的hits。
     for hit in hits:
         label = f"[來源{len(sources) + 1}]"
         part = f"{label} {hit['source']}／{hit['chunk_id']}\n{hit['text']}"
@@ -183,7 +180,7 @@ with st.form("rag_form"):
 if submitted:
     st.session_state.record = None   # 新提交先清掉舊結果
     try:
-        build_context([])            # 先確認A已完成；沒完成就停在這裡，不送付費請求
+        build_context([])            # 先驗證A可執行，再送付費請求
         chunks = split_chunks(document, "貼入文字")
         if not real_api:
             # ---------- 3A. 離線：第10週關鍵字規則找證據 → A組context，不呼叫模型 ----------

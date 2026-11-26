@@ -1,0 +1,10 @@
+{
+  "mode": "離線",
+  "question": "海王星有幾顆已知衛星？",
+  "top_k": 2,
+  "min_score": 0.25,
+  "hits": [],
+  "context": "",
+  "answer": null,
+  "check": "離線預覽：沒有呼叫模型"
+}
